@@ -83,12 +83,6 @@ Feature: Planned leadership takeover
   Scenario: New Superior send rejection Takeover Command to Current Superior
       #status NS: Received -> Rejected
 
-  Scenario: Current Superior received rejection Takeover Command from New Superior
-      #status CS: Send -> MR Received -> Rejected
-
-  Scenario: Current Superior did not received answer for Takeover Command from New Superior
-      #status CS: Send -> MR Received ... Timeout
-
   Scenario: New Superior did not send confirmation Takeover Command to Current Superior
       #NS tried to send confirmation but did not received ACK
       #status NS: Received -> Will Comply
