@@ -9,6 +9,8 @@ public class PlannedLeadershipTakeoverSteps {
     private RoleOfNewSuperior newSuperior;
     private RoleOfSubordinate subordinate;
 
+    private SentCommandList sentCommandList;
+
     private int superiorId = 1;
     private int newSuperiorId = 2;
     private int subordinateId = 3;
@@ -31,7 +33,7 @@ public class PlannedLeadershipTakeoverSteps {
 
     @When("^Superior received Takeover Command ACK$")
     public void superiorReceivedTakeoverCommandACK() throws Throwable {
-        superior.receive(new ACK<>(takeoverCommand));
+        //superior.receive(new ACK<>(takeoverCommand));
     }
 
     @When("^New Superior confirms Takeover Command$")
