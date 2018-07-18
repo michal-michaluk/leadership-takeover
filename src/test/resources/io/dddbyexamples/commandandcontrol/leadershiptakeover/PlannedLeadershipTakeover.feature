@@ -30,7 +30,7 @@ Feature: Planned leadership takeover
     And new Takeover Command is shown for operator [on New Superior]
 
     # Current Superior
-    When Superior received ACK
+    When Superior received Takeover Command ACK
     Then Takeover Command has status "MR Received" [on Current Superior]
 
     # New Superior operator
@@ -45,7 +45,7 @@ Feature: Planned leadership takeover
     And Control Takeover Command is sent to Subordinate [from Current Superior]
 
     # New Superior
-    When New Superior received ACK
+    When New Superior received Takeover Command Response ACK
     Then Takeover Command status is not changed, stays in "Will Comply" [on New Superior]
 
     # Subordinate
@@ -57,7 +57,7 @@ Feature: Planned leadership takeover
     And new Control Takeover Command is shown for operator [on Subordinate]
 
     # Current Superior
-    When Superior received ACK
+    When Superior received Control Takeover Command ACK
     Then Control Takeover Command has status "MR Received" [from Current Superior]
 
     # Subordinate operator
