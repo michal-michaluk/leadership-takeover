@@ -5,7 +5,6 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import io.dddbyexamples.commandandcontrol.infrastructure.SentCommandListProjection;
 import io.dddbyexamples.commandandcontrol.leadershiptakeover.newsuperior.RoleOfNewSuperior;
 import io.dddbyexamples.commandandcontrol.leadershiptakeover.subordinate.RoleOfSubordinate;
 import io.dddbyexamples.commandandcontrol.leadershiptakeover.superior.RoleOfSuperior;
@@ -20,23 +19,17 @@ public class PlannedLeadershipTakeoverSteps {
     private RoleOfSuperior superior;
     private RoleOfNewSuperior newSuperior;
     private RoleOfSubordinate subordinate;
-    private SentCommandListProjection sentCommandList;
-
-    private int newSuperiorId = 2;
-    private int subordinateId = 3;
 
     @Before
     public void setUp() throws Exception {
         superior = new RoleOfSuperior(communication, events);
         newSuperior = new RoleOfNewSuperior(communication, events);
         subordinate = new RoleOfSubordinate(communication, events);
-        sentCommandList = new SentCommandListProjection();
-        events.list = sentCommandList;
     }
 
     @When("^Superior command to New Superior to Take Control over Subordinate$")
     public void superiorCommandToNewSuperiorToTakeControlOverSubordinate() throws Throwable {
-        superior.giveTakeControlCommand(new TakeControlCommand(newSuperiorId, subordinateId));
+        superior.giveTakeControlCommand(new TakeControlCommand(2, 3));
     }
 
     @When("^New Superior receive the Take Control Command$")
