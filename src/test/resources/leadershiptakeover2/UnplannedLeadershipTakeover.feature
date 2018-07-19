@@ -1,7 +1,7 @@
-Feature: Planned leadership takeover
+Feature: Unplanned leadership takeover
 
   Domain example:
-Efektor traci dowódcę. Szuka dowódcy wg planu.
+  Efektor traci dowódcę. Szuka dowódcy wg planu.
 
   # Jak szukać kroków scenariuszy kożystając z Event Stormingu:
   # Given - pomarańczowe które zaszły wcześniej
@@ -9,43 +9,51 @@ Efektor traci dowódcę. Szuka dowódcy wg planu.
   # Then - pomarańczowe karteczki
 
   # przykład kompletnego scenariusza z perspektywy 2 aktorów
-  Scenario: Unplanned leadership takeover
+  Scenario: 1. Unplanned leadership takeover
 
     # Subordinate
-    When Subordinate notes no status from his Superior
-    Then No Superior Warning is shown
-
-    # Subordinate
-    When Subordinate operator check No Superior Report
+    Given Subordinate notes lost Superior
+    When Subordinate operator confirmed No Superior Warning
+    Then change superior state [in Subordinate]
     Then No Superior Report is sent in Status
 
-    # Any C2Unit
-    When C2 unit received No Superior Report
-    Then Check in Planed Superior List if should be interested to takeover leadership
-
     # Interested C2Unit
-    When received No Superior Report is filtered
+    Given according to plan C2 unit should takeover leadership
+    When C2 unit received No Superior Report
+    Then C2 is interested to takeover leadership
     Then question about readiness to takeover leadership is shown for operator
 
-    # Interested C2Unit
-    When operator C2 unit reported readiness to takeover leadership
+    # Interested C2Unit   zgłosił
+    When operator C2 unit confirm Readiness To Takeover Leadership
     Then Readiness To Takeover Leadership report is sent to Subordinate
 
     # Subordinate
+    Given List of other available superiors
+      | object | decision              |
+      | C2_1   | not responded         |
+      | C2_2   | will take superiority |
+      | C2_5   | will take superiority |
     When Subordinate received Readiness To Takeover Leadership report
-    Then add C2 unit to Priority List of available superiors
-    And show Priority List of available superiors for Subordinate operator
+    Then C2 unit is added to Priority List of available superiors
+    Then Priority List of available superiors is correctly sorted
+      | object | decision              |
+      | C2     | will take superiority |
+      | C2_2   | will take superiority |
+      | C2_5   | will take superiority |
+    And Priority List of available superiors is shown for Subordinate operator
 
     # Subordinate
     When Subordinate operator selected New Superior from Priority List of available superiors
-    Then set selected C2 unit as New Superior
-    And New Superior is marked on map [on Subordinate]
-    And send Status with New Superior
+    Then selected C2 unit is set as New Superior
+    And Status with New Superior is sent
+    //And New Superior is marked on map [on Subordinate]
+
 
     # New Superior
     When C2 unit received new status with it as superior
     Then New Subordinate is added to Subordinate List [on New Superior]
-    And New Subordinate is marked on map [on New Superior]
+    And Subordinate List with New Subordinate is shown for operator
+    //And New Subordinate is marked on map [on New Superior]
 
 
 
