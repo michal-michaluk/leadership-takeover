@@ -1,87 +1,186 @@
 package io.dddbyexamples.commandandcontrol.leadershiptakeover;
 
+import cucumber.api.PendingException;
+import cucumber.api.java.Before;
+import cucumber.api.java.en.And;
+import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import io.dddbyexamples.commandandcontrol.leadershiptakeover.comands.TakeoverCommand;
+import io.dddbyexamples.commandandcontrol.infrastructure.SentCommandListProjection;
+import io.dddbyexamples.commandandcontrol.leadershiptakeover.newsuperior.RoleOfNewSuperior;
+import io.dddbyexamples.commandandcontrol.leadershiptakeover.subordinate.RoleOfSubordinate;
+import io.dddbyexamples.commandandcontrol.leadershiptakeover.superior.RoleOfSuperior;
 
 public class PlannedLeadershipTakeoverSteps {
 
+    // dependencies
+    private FakeLeadershipTakeoverCommunication communication = new FakeLeadershipTakeoverCommunication();
+    private FakeCommandsEventsPropagation events = new FakeCommandsEventsPropagation();
+
+    // objects under tests
     private RoleOfSuperior superior;
     private RoleOfNewSuperior newSuperior;
     private RoleOfSubordinate subordinate;
+    private SentCommandListProjection sentCommandList;
 
-    private SentCommandList sentCommandList;
-
-    private int superiorId = 1;
     private int newSuperiorId = 2;
     private int subordinateId = 3;
 
-    private TakeoverCommandResponse takeoverCommandResponse;
-    private TakeoverCommand takeoverCommand;
-    private ControlTakeoverCommand controlTakeoverCommand;
-    private ControlTakeoverCommandResponse controlTakeoverCommandResponse;
-
-    @When("^Superior command to New Superior to take Leadership over Subordinate$")
-    public void superiorCommandToNewSuperiorToTakeLeadershipOverSubordinate() throws Throwable {
-        takeoverCommand = new TakeoverCommand(newSuperiorId, subordinateId);
-        superior.submit(takeoverCommand);
+    @Before
+    public void setUp() throws Exception {
+        superior = new RoleOfSuperior(communication, events);
+        newSuperior = new RoleOfNewSuperior(communication, events);
+        subordinate = new RoleOfSubordinate(communication, events);
+        sentCommandList = new SentCommandListProjection();
+        events.list = sentCommandList;
     }
 
-    @When("^New Superior receive the Takeover Command$")
+    @When("^Superior command to New Superior to Take Control over Subordinate$")
+    public void superiorCommandToNewSuperiorToTakeControlOverSubordinate() throws Throwable {
+        superior.giveTakeControlCommand(new TakeControlCommand(newSuperiorId, subordinateId));
+    }
+
+    @When("^New Superior receive the Take Control Command$")
     public void newSuperiorReceiveTheTakeoverCommand() throws Throwable {
-        newSuperior.receive(takeoverCommand);
+        newSuperior.receiveCommandFromOtherC2(communication.lastTakeControlCommand());
     }
 
-    @When("^Superior received Takeover Command ACK$")
+    @When("^Superior received Take Control Command Acknowledge")
     public void superiorReceivedTakeoverCommandACK() throws Throwable {
-        //superior.receive(new ACK<>(takeoverCommand));
+        communication.takeControlAcknowledged();
     }
 
-    @When("^New Superior confirms Takeover Command$")
+    @When("^New Superior accepts Take Control Command$")
     public void newSuperiorConfirmsTakeoverCommand() throws Throwable {
-        takeoverCommandResponse = new TakeoverCommandResponse(takeoverCommand, Response.ACCEPT);
-        newSuperior.submit(takeoverCommandResponse);
+        newSuperior.acceptTakeControl();
     }
 
-    @When("^Superior received Takeover Command Confirmation$")
+    @When("^Superior received acceptation of Take Control Command")
     public void superiorReceivedTakeoverCommandConfirmation() throws Throwable {
-        superior.receive(takeoverCommandResponse);
+        superior.receiveFromNewSuperior(communication.lastTakeoverCommandResponse());
     }
 
-    @When("^New Superior received Takeover Command Response ACK$")
+    @When("^New Superior received Take Control Response Acknowledge")
     public void newSuperiorReceivedTakeoverCommandResponseACK() throws Throwable {
-        newSuperior.receive(new ACK<>(takeoverCommandResponse));
-
+        communication.takeControlResponseAcknowledged();
     }
 
-    @When("^Subordinate received Control Takeover Command$")
+    @When("^Subordinate received Change Superior Command$")
     public void subordinateReceivedControlTakeoverCommand() throws Throwable {
-        controlTakeoverCommand = new ControlTakeoverCommand(superiorId, newSuperiorId);
-        subordinate.receive(controlTakeoverCommand);
+        subordinate.receiveCommandFromSuperior(communication.lastChangeSuperiorCommand());
     }
 
-    @When("^Superior received Control Takeover Command ACK$")
+    @When("^Superior received Change Superior Command Acknowledge$")
     public void superiorReceivedControlTakeoverCommandACK() throws Throwable {
-        superior.receive2(new ACK<>(controlTakeoverCommand));
+        communication.changeSuperiorCommandAcknowledged();
     }
 
-    @When("^Subordinate confirms Control Takeover Command$")
+    @When("^Subordinate confirms Change Superior Command$")
     public void subordinateConfirmsControlTakeoverCommand() throws Throwable {
-        controlTakeoverCommandResponse = new ControlTakeoverCommandResponse(controlTakeoverCommand, Response.ACCEPT);
-        subordinate.submit(controlTakeoverCommandResponse);
+        subordinate.confirmChangeSuperiorCommand();
     }
 
-    @When("^Superior received Control Takeover Command Confirmation$")
+    @When("^Superior received confirmation of Change Superior Command")
     public void superiorReceivedControlTakeoverCommandConfirmation() throws Throwable {
-        superior.receive(controlTakeoverCommandResponse);
+        superior.receiveFromSubordinate(communication.lastChangeSuperiorResponse());
     }
 
     @When("^Status Report with New Superior is received \\[on Current Superior]$")
     public void statusReportWithNewSuperiorIsReceivedOnCurrentSuperior() throws Throwable {
-        superior.receive(new StatusReport(subordinateId, newSuperiorId));
+        superior.receiveFromSubordinate(communication.lastStatusReport());
     }
 
     @When("^Status Report with New Superior is received \\[on New Superior]$")
     public void statusReportWithNewSuperiorIsReceivedOnNewSuperior() throws Throwable {
-        newSuperior.receive(new StatusReport(subordinateId, newSuperiorId));
+        newSuperior.receiveFromSubordinate(communication.lastStatusReport());
+    }
+
+    @Then("^Take Control Command has status \"([^\"]*)\" \\[on Current Superior]$")
+    public void takeControlCommandHasStatusOnCurrentSuperior(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Take Control Command has status \"([^\"]*)\" \\[on New Superior]$")
+    public void takeControlCommandHasStatusOnNewSuperior(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Take Control status is not changed, stays in \"([^\"]*)\" \\[on New Superior]$")
+    public void takeControlStatusIsNotChangedStaysInOnNewSuperior(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Status Report with New Superior is sent \\[from Subordinate]$")
+    public void statusReportWithNewSuperiorIsSentFromSubordinate() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Change Superior Command has status \"([^\"]*)\" \\[on Subordinate]$")
+    public void changeSuperiorCommandHasStatusOnSubordinate(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Change Superior Command has status \"([^\"]*)\" \\[from Current Superior]$")
+    public void changeSuperiorCommandHasStatusFromCurrentSuperior(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Change Superior Command has status \"([^\"]*)\" \\[on Current Superior]$")
+    public void changeSuperiorCommandHasStatusOnCurrentSuperior(String status) throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^New Superior is marked on map \\[on Subordinate]$")
+    public void newSuperiorIsMarkedOnMapOnSubordinate() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Superior is changed \\[on Subordinate]$")
+    public void superiorIsChangedOnSubordinate() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^the Take Control is send to New Superior$")
+    public void theTakeControlIsSendToNewSuperior() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @And("^Change Superior Command Confirmation is sent \\[from Subordinate]$")
+    public void changeSuperiorCommandConfirmationIsSentFromSubordinate() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @And("^Take Control Command Confirmation is sent \\[from New Superior]$")
+    public void takeControlCommandConfirmationIsSentFromNewSuperior() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @And("^Change Superior Command is sent to Subordinate \\[from Current Superior]$")
+    public void changeSuperiorCommandIsSentToSubordinateFromCurrentSuperior() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Subordinate is removed from Subordinate List \\[on Current Superior]$")
+    public void subordinateIsRemovedFromSubordinateListOnCurrentSuperior() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
+    }
+
+    @Then("^Subordinate is added to Subordinate List \\[on New Superior]$")
+    public void subordinateIsAddedToSubordinateListOnNewSuperior() throws Throwable {
+        // Write code here that turns the phrase above into concrete actions
+        throw new PendingException();
     }
 }
