@@ -9,12 +9,12 @@ public class SubordinateService {
     private SubordinateRepository repository;
 
     public void receiveCommandFromSuperior(ChangeSuperiorCommand command) {
-        repository.get(command.getNewSuperiorId())
+        repository.get()
                 .receiveCommandFromSuperior(command);
     }
 
     public void confirmChangeSuperiorCommand(ChangeSuperiorCommand command) {
-        repository.get(command.getNewSuperiorId())
+        repository.get()
                 .confirmChangeSuperiorCommand();
     }
 }
