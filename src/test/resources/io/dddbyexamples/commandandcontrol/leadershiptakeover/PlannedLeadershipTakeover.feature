@@ -83,3 +83,33 @@ Feature: Planned leadership takeover
     Then Subordinate is added to Subordinate List [on New Superior]
     And Take Control Command has status "Completed" [on New Superior]
 
+#Daniel i Paweł
+
+  Scenario: Current Superior did not send Takeover Command to New Superior
+      #CS tried to send command but did not received ACK
+      #status CS: Send ... Timeout
+
+  Scenario: New Superior send rejection Takeover Command to Current Superior
+      #status NS: Received -> Rejected
+
+  Scenario: New Superior did not send confirmation Takeover Command to Current Superior
+      #NS tried to send confirmation but did not received ACK
+      #status NS: Received -> Will Comply
+
+  Scenario: New Superior did not send rejection Takeover Command to Current Superior
+      #NS tried to send rejection but did not received ACK
+      #status CS: Send -> MR Received ... Timeout
+
+  Scenario: Current Superior did not send Control Takeover Command to Subordinate
+      #CS tried to send command but did not received ACK
+      #status CS: Send ... Timeout
+
+  Scenario: Subordinate did not confirm Control Takeover Command
+      #status CS: Send -> MR Received ... Timeout
+      #status S:  Received
+
+  Scenario: Subordinate did not send confirmation Control Takeover Command
+      #S tried to send confirmation but did not received ACK
+      #status S: Received -> Will Comply ... Timeout
+
+
